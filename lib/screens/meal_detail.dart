@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:meals/models/meal.dart';
 
 class MealDetailScreen extends StatelessWidget {
-  const MealDetailScreen({super.key, required this.meal});
+  const MealDetailScreen(
+      {super.key, required this.meal, required this.onToggleFavorite});
 
   final Meal meal;
+  final void Function(Meal meal) onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class MealDetailScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.star_border),
-            onPressed: () {},
+            onPressed: () => onToggleFavorite(meal),
           ),
         ],
       ),
@@ -50,7 +52,7 @@ class MealDetailScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(step,
-              textAlign: TextAlign.left,
+                  textAlign: TextAlign.left,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
