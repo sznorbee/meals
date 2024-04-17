@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meals/providers/filters_provider.dart';
 import 'package:meals/screens/categories.dart';
 import 'package:meals/screens/filters.dart';
 import 'package:meals/screens/meals.dart';
@@ -17,13 +18,6 @@ class TabsScreen extends ConsumerStatefulWidget {
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedPageIndex = 0;
 
-  Map<Filter, bool> _selectedFilters = {
-    Filter.glutenFree: false,
-    Filter.lactoseFree: false,
-    Filter.vegan: false,
-    Filter.vegetarian: false,
-  };
-
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
@@ -33,33 +27,29 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   void _setScreen(String identifier) async {
     Navigator.of(context).pop();
     if (identifier == 'filters') {
-      final result = await Navigator.of(context)
+      await Navigator.of(context)
           .push<Map<Filter, bool>>(MaterialPageRoute(builder: (_) {
-        return FiltersScreen(
-          currentFilters: _selectedFilters,
-        );
+        return const FiltersScreen();
       }));
-      setState(() {
-        _selectedFilters = result ?? _selectedFilters;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final meals = ref.watch(mealsProvider);
+    final selectedFilters = ref.watch(filtersProvider);
 
     final availableMeals = meals.where((meal) {
-      if (_selectedFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
+      if (selectedFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
         return false;
       }
-      if (_selectedFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
+      if (selectedFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
         return false;
       }
-      if (_selectedFilters[Filter.vegan]! && !meal.isVegan) {
+      if (selectedFilters[Filter.vegan]! && !meal.isVegan) {
         return false;
       }
-      if (_selectedFilters[Filter.vegetarian]! && !meal.isVegetarian) {
+      if (selectedFilters[Filter.vegetarian]! && !meal.isVegetarian) {
         return false;
       }
       return true;
@@ -72,8 +62,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
     if (_selectedPageIndex == 1) {
       final favoriteMeals = ref.watch(favoriteMealsProvider);
-      activePage =
-          MealsScreen(meals: favoriteMeals);
+      activePage = MealsScreen(meals: favoriteMeals);
       activePageTitle = 'Favorites';
     }
 

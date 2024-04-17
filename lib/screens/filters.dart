@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:meals/providers/filters_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum Filter {
-  glutenFree,
-  lactoseFree,
-  vegan,
-  vegetarian,
-}
-
-class FiltersScreen extends StatefulWidget {
-  const FiltersScreen({super.key, required this.currentFilters});
-
-  final Map<Filter, bool> currentFilters;
+class FiltersScreen extends ConsumerStatefulWidget {
+  const FiltersScreen({super.key});
 
   @override
-  State<FiltersScreen> createState() => _FiltersScreenState();
+  ConsumerState<FiltersScreen> createState() => _FiltersScreenState();
 }
 
-class _FiltersScreenState extends State<FiltersScreen> {
+class _FiltersScreenState extends ConsumerState<FiltersScreen> {
   bool _isGlutenFree = false;
   bool _isLactoseFree = false;
   bool _isVegan = false;
@@ -25,10 +18,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
   @override
   void initState() {
     super.initState();
-    _isGlutenFree = widget.currentFilters[Filter.glutenFree]!;
-    _isLactoseFree = widget.currentFilters[Filter.lactoseFree]!;
-    _isVegan = widget.currentFilters[Filter.vegan]!;
-    _isVegetarian = widget.currentFilters[Filter.vegetarian]!;
+    final activeFilters = ref.read(filtersProvider);
+    _isGlutenFree = activeFilters[Filter.glutenFree]!;
+    _isLactoseFree = activeFilters[Filter.lactoseFree]!;
+    _isVegan = activeFilters[Filter.vegan]!;
+    _isVegetarian = activeFilters[Filter.vegetarian]!;
   }
 
   void _setGlutenFree(bool value) {
@@ -93,12 +87,13 @@ class _FiltersScreenState extends State<FiltersScreen> {
         canPop: false,
         onPopInvoked: (bool didPop) {
           if (didPop) return;
-          Navigator.of(context).pop({
+          ref.read(filtersProvider.notifier).setFilters({
             Filter.glutenFree: _isGlutenFree,
             Filter.lactoseFree: _isLactoseFree,
             Filter.vegan: _isVegan,
             Filter.vegetarian: _isVegetarian,
           });
+          Navigator.of(context).pop();
         },
         child: Column(
           children: [
